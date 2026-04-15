@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mundo Data — Aprendé datos en español</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f2eb;
+  --bg2: #edeae0;
+  --ink: #1a1712;
+  --ink2: #4a4640;
+  --ink3: #7a756e;
+  --accent: #e8500a;
+  --accent2: #1a5c3a;
+  --accent-light: #fdeee6;
+  --green-light: #e6f2ec;
+  --card: #ffffff;
+  --border: rgba(26,23,18,0.1);
+  --border2: rgba(26,23,18,0.06);
+  --font-head: 'Fraunces', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── GRAIN OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.4;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem;
+  background: rgba(245,242,235,0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+}
+.nav-logo {
+  font-family: var(--font-head);
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  display: flex; align-items: center; gap: 8px;
+  text-decoration: none;
+}
+.logo-dot {
+  width: 10px; height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: inline-block;
+}
+.nav-right { display: flex; align-items: center; gap: 0.75rem; }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0.45rem 1.1rem;
+  border-radius: 40px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: all 0.18s;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink2);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.btn-primary:hover { background: #cc4208; transform: translateY(-1px); }
+.btn-ink {
+  background: var(--ink);
+  color: #fff;
+  font-weight: 600;
+}
+.btn-ink:hover { background: #2d2820; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  padding: 100px 2rem 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent-light);
+  border: 1px solid rgba(232,80,10,0.2);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.9rem;
+  border-radius: 40px;
+  margin-bottom: 2rem;
+  width: fit-content;
+  animation: fadeUp 0.6s ease both;
+}
+.hero-eyebrow span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; display: inline-block; }
+
+.hero-title {
+  font-family: var(--font-head);
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  max-width: 800px;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+.hero-title .line2 {
+  display: block;
+  color: var(--accent2);
+}
+
+.hero-sub {
+  font-size: 1.1rem;
+  color: var(--ink2);
+  max-width: 520px;
+  line-height: 1.75;
+  margin-bottom: 2.5rem;
+  animation: fadeUp 0.6s 0.2s ease both;
+  font-weight: 300;
+}
+
+.hero-cta {
+  display: flex; align-items: center; gap: 1rem;
+  flex-wrap: wrap;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+.btn-lg { padding: 0.8rem 2rem; font-size: 1rem; border-radius: 40px; }
+
+.hero-proof {
+  display: flex; align-items: center; gap: 1rem;
+  margin-top: 3.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--border);
+  animation: fadeUp 0.6s 0.4s ease both;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+.proof-item { display: flex; flex-direction: column; }
+.proof-item strong {
+  font-family: var(--font-head);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1;
+}
+.proof-item small { font-size: 0.8rem; color: var(--ink3); margin-top: 2px; }
+
+.hero-deco {
+  position: absolute;
+  right: -40px; top: 50%;
+  transform: translateY(-60%);
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  pointer-events: none;
+  animation: fadeUp 0.8s 0.5s ease both;
+}
+.hero-deco::before {
+  content: '';
+  position: absolute;
+  inset: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+}
+.hero-deco::after {
+  content: 'MUNDO\ADATA';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  font-family: var(--font-head);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  white-space: pre;
+  text-align: center;
+  line-height: 2;
+}
+
+/* ── MARQUEE ── */
+.marquee-wrap {
+  background: var(--ink);
+  color: #f5f2eb;
+  padding: 0.85rem 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.marquee-track {
+  display: inline-flex;
+  animation: marquee 22s linear infinite;
+  gap: 0;
+}
+.marquee-item {
+  display: inline-flex; align-items: center; gap: 1rem;
+  padding: 0 2rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(245,242,235,0.7);
+}
+.marquee-item strong { color: #f5f2eb; }
+.marquee-sep { color: var(--accent); font-size: 1rem; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ── SECTIONS ── */
+.section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+.section-sm { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+
+.label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  display: flex; align-items: center; gap: 6px;
+}
+.label::before {
+  content: '';
+  width: 16px; height: 1px;
+  background: var(--accent);
+}
+h2.section-title {
+  font-family: var(--font-head);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+h2.section-title em { font-style: italic; color: var(--accent); }
+.section-sub {
+  color: var(--ink2);
+  font-size: 1.05rem;
+  max-width: 500px;
+  font-weight: 300;
+  line-height: 1.75;
+}
+
+/* ── PILLARS ── */
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-top: 3rem;
+}
+.pillar {
+  background: var(--bg);
+  padding: 2.5rem 2rem;
+  transition: background 0.2s;
+}
+.pillar:hover { background: var(--card); }
+.pillar-num {
+  font-family: var(--font-head);
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--border);
+  line-height: 1;
+  margin-bottom: 1rem;
+  color: rgba(26,23,18,0.08);
+}
+.pillar h3 {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+.pillar p { color: var(--ink2); font-size: 0.9rem; line-height: 1.7; font-weight: 300; }
+.pillar-tag {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.75rem;
+  border-radius: 40px;
+}
+.tag-free { background: var(--green-light); color: var(--accent2); }
+.tag-pro { background: var(--accent-light); color: var(--accent); }
+
+/* ── DIARIO PREVIEW ── */
+.diario-wrap {
+  background: var(--ink);
+  color: #f5f2eb;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 3rem;
+}
+.diario-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  flex-wrap: wrap; gap: 0.75rem;
+}
+.diario-logo {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 900;
+  display: flex; align-items: center; gap: 8px;
+}
+.diario-date { font-size: 0.78rem; color: rgba(245,242,235,0.45); letter-spacing: 0.04em; }
+.diario-badge {
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.7rem;
+  border-radius: 40px;
+}
+.diario-body { padding: 2rem; }
+.diario-edition {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(245,242,235,0.35);
+  margin-bottom: 1.5rem;
+}
+.diario-headline {
+  font-family: var(--font-head);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  max-width: 600px;
+}
+.diario-intro {
+  color: rgba(245,242,235,0.65);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  max-width: 620px;
+  font-weight: 300;
+  margin-bottom: 2rem;
+}
+.diario-items { display: flex; flex-direction: column; gap: 0; }
+.diario-item {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.diario-item-num {
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: rgba(245,242,235,0.12);
+  line-height: 1;
+  min-width: 28px;
+}
+.diario-item-content h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
+.diario-item-content p { font-size: 0.82rem; color: rgba(245,242,235,0.5); font-weight: 300; line-height: 1.6; }
+.diario-blur {
+  position: relative;
+  overflow: hidden;
+}
+.diario-blur::after {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 120px;
+  background: linear-gradient(transparent, var(--ink));
+  pointer-events: none;
+}
+.diario-cta {
+  text-align: center;
+  padding: 1.5rem 2rem 2rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.diario-cta p { font-size: 0.85rem; color: rgba(245,242,235,0.45); margin-bottom: 1rem; }
+
+/* ── PARA QUIÉN ── */
+.audience-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+.audience-card {
+  border-radius: 16px;
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.audience-card.young {
+  background: var(--ink);
+  color: #f5f2eb;
+}
+.audience-card.career {
+  background: var(--accent-light);
+  border: 1px solid rgba(232,80,10,0.15);
+}
+.audience-age {
+  font-family: var(--font-head);
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 1rem;
+  letter-spacing: -0.04em;
+}
+.audience-card.young .audience-age { color: rgba(245,242,235,0.12); }
+.audience-card.career .audience-age { color: rgba(232,80,10,0.12); }
+.audience-card h3 {
+  font-family: var(--font-head);
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+.audience-card.young h3 { color: #f5f2eb; }
+.audience-card.career h3 { color: var(--ink); }
+.audience-card p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  font-weight: 300;
+}
+.audience-card.young p { color: rgba(245,242,235,0.6); }
+.audience-card.career p { color: var(--ink2); }
+.audience-list {
+  list-style: none;
+  margin-top: 1.25rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.audience-list li {
+  font-size: 0.85rem;
+  display: flex; align-items: flex-start; gap: 8px;
+  font-weight: 400;
+}
+.audience-card.young .audience-list li { color: rgba(245,242,235,0.7); }
+.audience-card.career .audience-list li { color: var(--ink2); }
+.audience-list li::before {
+  content: '→';
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+
+
+/* ── PRICING ── */
+.pricing-wrap { margin-top: 3rem; }
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+.pricing-card {
+  border-radius: 16px;
+  padding: 2.5rem;
+  position: relative;
+}
+.pricing-card.free {
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.pricing-card.pro {
+  background: var(--ink);
+  color: #f5f2eb;
+}
+.pricing-plan {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+.pricing-card.free .pricing-plan { color: var(--ink3); }
+.pricing-card.pro .pricing-plan { color: rgba(245,242,235,0.45); }
+.pricing-price {
+  font-family: var(--font-head);
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.04em;
+}
+.pricing-card.free .pricing-price { color: var(--ink); }
+.pricing-card.pro .pricing-price { color: #f5f2eb; }
+.pricing-note {
+  font-size: 0.82rem;
+  margin-bottom: 2rem;
+}
+.pricing-card.free .pricing-note { color: var(--ink3); }
+.pricing-card.pro .pricing-note { color: rgba(245,242,235,0.4); }
+.pricing-features { list-style: none; margin-bottom: 2.5rem; display: flex; flex-direction: column; gap: 0; }
+.pricing-features li {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0.65rem 0;
+  font-size: 0.88rem;
+  border-bottom: 1px solid;
+}
+.pricing-card.free .pricing-features li { border-color: var(--border2); color: var(--ink2); }
+.pricing-card.pro .pricing-features li { border-color: rgba(255,255,255,0.06); color: rgba(245,242,235,0.7); }
+.pricing-features li:last-child { border-bottom: none; }
+.pricing-features li::before { content: '✓'; font-weight: 700; flex-shrink: 0; }
+.pricing-card.free .pricing-features li::before { color: var(--accent2); }
+.pricing-card.pro .pricing-features li::before { color: var(--accent); }
+.pricing-features li.off { opacity: 0.35; }
+.pricing-features li.off::before { content: '–'; }
+.btn-white { background: #f5f2eb; color: var(--ink); font-weight: 600; }
+.btn-white:hover { background: #fff; }
+.btn-border { background: transparent; border: 1px solid var(--border); color: var(--ink); font-weight: 500; }
+.btn-border:hover { border-color: var(--ink); }
+
+/* ── DISCORD ── */
+.discord-band {
+  background: #5865f2;
+  padding: 2rem;
+  text-align: center;
+  color: #fff;
+}
+.discord-band p { font-size: 1rem; font-weight: 500; margin-bottom: 1rem; }
+.discord-band small { display: block; font-size: 0.8rem; opacity: 0.65; margin-top: 0.5rem; }
+.btn-discord { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); font-weight: 600; }
+.btn-discord:hover { background: rgba(255,255,255,0.25); }
+
+/* ── CTA FINAL ── */
+.cta-final {
+  text-align: center;
+  padding: 7rem 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.cta-final h2 {
+  font-family: var(--font-head);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: 1.25rem;
+}
+.cta-final h2 em { font-style: italic; color: var(--accent); }
+.cta-final p { color: var(--ink2); margin-bottom: 2.5rem; font-weight: 300; font-size: 1.05rem; }
+.cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 1rem;
+}
+footer .nav-logo { font-size: 1rem; }
+footer small { color: var(--ink3); font-size: 0.8rem; }
+footer nav { position: static; background: none; border: none; backdrop-filter: none; padding: 0; height: auto; }
+footer nav a { color: var(--ink3); font-size: 0.8rem; text-decoration: none; margin-left: 1.25rem; }
+footer nav a:hover { color: var(--ink); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .hero-deco { display: none; }
+  .pillars { grid-template-columns: 1fr; }
+  .audience-grid { grid-template-columns: 1fr; }
+  .creator-inner { grid-template-columns: 1fr; gap: 2rem; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; text-align: center; }
+  footer nav { margin-top: 0.5rem; }
+  footer nav a { margin: 0 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#"><span class="logo-dot"></span>Mundo Data</a>
+  <div class="nav-right">
+    <button class="btn btn-ghost" onclick="alert('Login — próximamente')">Entrar</button>
+    <button class="btn btn-primary" onclick="alert('Registro — próximamente')">Unirme gratis</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow"><span></span>La comunidad de datos en español</div>
+  <h1 class="hero-title">
+    Tu carrera<br>
+    en <em>datos</em> empieza<br>
+    <span class="line2">acá.</span>
+  </h1>
+  <p class="hero-sub">
+    Noticias diarias del mundo data, tutoriales, recursos y una comunidad de personas que están en el mismo camino que vos.
+  </p>
+  <div class="hero-cta">
+    <button class="btn btn-primary btn-lg" onclick="alert('Registro — próximamente')">Empezar gratis →</button>
+    <button class="btn btn-ghost btn-lg" onclick="document.getElementById('diario').scrollIntoView({behavior:'smooth'})">Ver el Diario de Datos</button>
+  </div>
+  <div class="hero-proof">
+    <div class="proof-item">
+      <strong>50k+</strong>
+      <small>seguidores en TikTok</small>
+    </div>
+    <div class="proof-item">
+      <strong>3.200+</strong>
+      <small>en la comunidad</small>
+    </div>
+    <div class="proof-item">
+      <strong>Diario</strong>
+      <small>de datos en español</small>
+    </div>
+    <div class="proof-item">
+      <strong>100%</strong>
+      <small>en español</small>
+    </div>
+  </div>
+  <div class="hero-deco"></div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item"><strong>SQL</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Python para datos</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Power BI</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Machine Learning</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Tableau</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>dbt</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Data Engineering</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Pandas</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Estadística</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Carreras en datos</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>SQL</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Python para datos</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Power BI</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Machine Learning</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Tableau</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>dbt</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Data Engineering</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Pandas</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Estadística</strong> <span class="marquee-sep">·</span></div>
+    <div class="marquee-item"><strong>Carreras en datos</strong> <span class="marquee-sep">·</span></div>
+  </div>
+</div>
+
+<!-- QUÉ ES -->
+<section class="section reveal">
+  <div class="label">Qué es Mundo Data</div>
+  <h2 class="section-title">Todo lo que necesitás<br>para <em>entrar al mundo data</em></h2>
+  <p class="section-sub">Una plataforma pensada para los que empiezan y los que quieren crecer. Contenido en español, sin vueltas.</p>
+  <div class="pillars">
+    <div class="pillar">
+      <div class="pillar-num">01</div>
+      <h3>Diario de Datos</h3>
+      <p>Un resumen diario con las noticias más importantes del mundo del análisis de datos. Lo que pasó hoy en la industria, en 5 minutos.</p>
+      <span class="pillar-tag tag-pro">Plan Pro</span>
+    </div>
+    <div class="pillar">
+      <div class="pillar-num">02</div>
+      <h3>Tutoriales y recursos</h3>
+      <p>Artículos técnicos, videos, notebooks de Python y datasets reales para practicar. Desde nivel cero hasta avanzado.</p>
+      <span class="pillar-tag tag-free">Gratis</span>
+    </div>
+    <div class="pillar">
+      <div class="pillar-num">03</div>
+      <h3>Comunidad</h3>
+      <p>Más de 3.200 personas aprendiendo datos. Hacé preguntas, compartí tu progreso y conectá con otros profesionales.</p>
+      <span class="pillar-tag tag-free">Gratis</span>
+    </div>
+  </div>
+</section>
+
+<!-- DIARIO PREVIEW -->
+<section class="section reveal" id="diario">
+  <div class="label">El Diario de Datos</div>
+  <h2 class="section-title">Las noticias de datos<br><em>cada mañana</em></h2>
+  <p class="section-sub">Lo más importante del mundo data resumido por IA y revisado por expertos. En tu idioma, todos los días.</p>
+
+  <div class="diario-wrap">
+    <div class="diario-header">
+      <div class="diario-logo"><span class="logo-dot"></span>Mundo Data — Diario</div>
+      <div class="diario-date">Miércoles 15 de abril, 2026</div>
+      <span class="diario-badge">Edición #247</span>
+    </div>
+    <div class="diario-body">
+      <div class="diario-edition">Edición de hoy · 4 noticias · lectura de 5 min</div>
+      <div class="diario-headline">OpenAI lanza nueva API para análisis de datasets estructurados directamente desde Python</div>
+      <p class="diario-intro">Esta semana fue movida en el mundo del data. OpenAI sorprendió con una integración directa con Pandas, Google anunció cambios en BigQuery y hay una nueva herramienta open-source de visualización que vale la pena conocer.</p>
+
+      <div class="diario-blur">
+        <div class="diario-items">
+          <div class="diario-item">
+            <div class="diario-item-num">01</div>
+            <div class="diario-item-content">
+              <h4>OpenAI + Pandas: análisis de datos con lenguaje natural</h4>
+              <p>La nueva API permite hacer preguntas en español sobre un DataFrame y obtener resultados automáticamente. Esto cambia bastante el flujo de trabajo para analistas junior.</p>
+            </div>
+          </div>
+          <div class="diario-item">
+            <div class="diario-item-num">02</div>
+            <div class="diario-item-content">
+              <h4>Google BigQuery reduce precios un 30% para queries bajo 1TB</h4>
+              <p>Buena noticia para equipos chicos y freelancers. El cambio entra en vigor el 1 de mayo y aplica a todas las regiones.</p>
+            </div>
+          </div>
+          <div class="diario-item">
+            <div class="diario-item-num">03</div>
+            <div class="diario-item-content">
+              <h4>Evidence.dev: reportes de datos con Markdown y SQL</h4>
+              <p>Una herramienta open-source para crear dashboards estáticos directamente desde archivos .sql. Sin servidores, sin configuración.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="diario-cta">
+      <p>Esta es una edición de muestra. Suscribite al plan Pro para leer el Diario todos los días.</p>
+      <button class="btn btn-primary" onclick="document.getElementById('planes').scrollIntoView({behavior:'smooth'})">Ver planes →</button>
+    </div>
+  </div>
+</section>
+
+<!-- PARA QUIÉN -->
+<section class="section reveal">
+  <div class="label">Para quién es</div>
+  <h2 class="section-title">No importa de dónde<br><em>venís</em></h2>
+  <p class="section-sub">Mundo Data está pensada para dos momentos de vida muy distintos, pero con el mismo objetivo: entrar al mundo de los datos.</p>
+  <div class="audience-grid">
+    <div class="audience-card young">
+      <div class="audience-age">16–22</div>
+      <h3>Estás eligiendo tu camino</h3>
+      <p>No sabés qué estudiar o acabás de empezar y querés saber si los datos son para vos. Acá encontrás el mapa.</p>
+      <ul class="audience-list">
+        <li>Contenido desde cero, sin asumir conocimientos previos</li>
+        <li>Comunidad con gente en tu misma situación</li>
+        <li>Orientación sobre carreras y certificaciones</li>
+        <li>Proyectos para armar tu portafolio desde el día uno</li>
+      </ul>
+    </div>
+    <div class="audience-card career">
+      <div class="audience-age">30–55</div>
+      <h3>Querés reinventarte profesionalmente</h3>
+      <p>Tenés experiencia en tu campo pero el mercado cambia y querés sumar datos a tu perfil o hacer una transición completa.</p>
+      <ul class="audience-list">
+        <li>Rutas de aprendizaje adaptadas a tu industria</li>
+        <li>Cómo combinar tu experiencia previa con datos</li>
+        <li>Casos reales de personas que ya hicieron la transición</li>
+        <li>Networking con profesionales activos</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- DISCORD -->
+<div class="discord-band reveal">
+  <p>💬 La comunidad vive en Discord — ya somos más de 3.200 personas</p>
+  <button class="btn btn-discord btn-lg" onclick="alert('Link a Discord — próximamente')">Unirme al Discord gratis</button>
+  <small>Gratis para siempre. Solo necesitás crear una cuenta.</small>
+</div>
+
+<!-- PLANES -->
+<section class="section reveal" id="planes">
+  <div class="label">Planes</div>
+  <h2 class="section-title">Empezá gratis.<br>Crecé con <em>Pro.</em></h2>
+  <p class="section-sub">La comunidad siempre gratis. El Diario de Datos y los recursos premium con el plan Pro.</p>
+  <div class="pricing-wrap">
+    <div class="pricing-grid">
+      <div class="pricing-card free">
+        <div class="pricing-plan">Gratis</div>
+        <div class="pricing-price">$0</div>
+        <p class="pricing-note">Para siempre</p>
+        <ul class="pricing-features">
+          <li>Comunidad en Discord</li>
+          <li>Tutoriales básicos</li>
+          <li>Newsletter semanal</li>
+          <li class="off">Diario de Datos diario</li>
+          <li class="off">Artículos premium</li>
+          <li class="off">Datasets y notebooks</li>
+          <li class="off">Desafíos mensuales</li>
+        </ul>
+        <button class="btn btn-border btn-lg" style="width:100%" onclick="alert('Registro — próximamente')">Crear cuenta gratis</button>
+      </div>
+      <div class="pricing-card pro">
+        <div class="pricing-plan">Pro</div>
+        <div class="pricing-price">$9</div>
+        <p class="pricing-note">por mes · en USD · o equivalente en tu moneda</p>
+        <ul class="pricing-features">
+          <li>Todo lo del plan gratis</li>
+          <li>Diario de Datos todos los días</li>
+          <li>Artículos premium ilimitados</li>
+          <li>Datasets y notebooks descargables</li>
+          <li>Desafíos mensuales con premios</li>
+          <li>Badge de miembro Pro en Discord</li>
+          <li>Acceso anticipado a nuevo contenido</li>
+        </ul>
+        <button class="btn btn-white btn-lg" style="width:100%" onclick="alert('Registro — próximamente')">Empezar 7 días gratis →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final reveal">
+  <h2>Tu momento<br>en datos es <em>ahora.</em></h2>
+  <p>Unite hoy. La comunidad es gratis, el Diario de Datos tiene 7 días de prueba sin tarjeta de crédito.</p>
+  <div class="cta-btns">
+    <button class="btn btn-primary btn-lg" onclick="alert('Registro — próximamente')">Empezar gratis →</button>
+    <button class="btn btn-ghost btn-lg" onclick="alert('Discord — próximamente')">Unirme al Discord</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a class="nav-logo" href="#"><span class="logo-dot"></span>Mundo Data</a>
+  <small>© 2025 Mundo Data — Todos los derechos reservados</small>
+  <nav>
+    <a href="#">Términos</a>
+    <a href="#">Privacidad</a>
+    <a href="#">Contacto</a>
+  </nav>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

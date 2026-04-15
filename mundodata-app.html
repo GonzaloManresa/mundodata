@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mundo Data — App</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f2eb;
+  --bg2: #edeae0;
+  --ink: #1a1712;
+  --ink2: #4a4640;
+  --ink3: #7a756e;
+  --accent: #e8500a;
+  --accent2: #1a5c3a;
+  --accent-light: #fdeee6;
+  --green-light: #e6f2ec;
+  --card: #ffffff;
+  --border: rgba(26,23,18,0.1);
+  --border2: rgba(26,23,18,0.06);
+  --font-head: 'Fraunces', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ─── VIEWS ─── */
+.view { display: none; }
+.view.active { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ─── NAV SIMPLE ─── */
+.topbar {
+  height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(245,242,235,0.9);
+  backdrop-filter: blur(10px);
+  position: sticky; top: 0; z-index: 50;
+  flex-shrink: 0;
+}
+.logo {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  display: flex; align-items: center; gap: 7px;
+  cursor: pointer;
+  color: var(--ink);
+  text-decoration: none;
+}
+.logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; display: inline-block; }
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 0.5rem 1.25rem;
+  border-radius: 40px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s;
+  text-decoration: none;
+}
+.btn-primary { background: var(--accent); color: #fff; font-weight: 600; }
+.btn-primary:hover { background: #cc4208; }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--ink2); }
+.btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+.btn-ink { background: var(--ink); color: #f5f2eb; font-weight: 600; }
+.btn-ink:hover { background: #2d2820; }
+.btn-lg { padding: 0.75rem 2rem; font-size: 0.95rem; }
+.btn-full { width: 100%; }
+
+/* ─── AUTH LAYOUT ─── */
+.auth-page {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 2rem 1rem;
+  position: relative;
+}
+.auth-page::before {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 500px; height: 400px;
+  background: radial-gradient(ellipse, rgba(232,80,10,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+.auth-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 4px 40px rgba(26,23,18,0.06);
+}
+.auth-card h2 {
+  font-family: var(--font-head);
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.4rem;
+}
+.auth-card h2 em { font-style: italic; color: var(--accent); }
+.auth-card .sub {
+  color: var(--ink3);
+  font-size: 0.88rem;
+  margin-bottom: 2rem;
+  font-weight: 300;
+}
+.trial-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--accent-light);
+  border: 1px solid rgba(232,80,10,0.18);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 0.3rem 0.8rem;
+  border-radius: 40px;
+  margin-bottom: 1.5rem;
+}
+.form-group { margin-bottom: 1.1rem; }
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink2);
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.02em;
+}
+.form-group input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.form-group input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(232,80,10,0.08);
+}
+.form-group input::placeholder { color: var(--ink3); }
+.auth-switch {
+  text-align: center;
+  color: var(--ink3);
+  font-size: 0.82rem;
+  margin-top: 1.25rem;
+}
+.auth-switch a { color: var(--accent); cursor: pointer; font-weight: 600; }
+.form-error {
+  font-size: 0.78rem;
+  color: #c0392b;
+  margin-top: 0.4rem;
+  display: none;
+}
+.form-error.show { display: block; }
+
+/* ─── ONBOARDING ─── */
+.onboard-page {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 2rem 1rem;
+}
+.onboard-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%; max-width: 560px;
+  box-shadow: 0 4px 40px rgba(26,23,18,0.06);
+}
+.onboard-progress {
+  display: flex; gap: 6px; margin-bottom: 2rem;
+}
+.progress-dot {
+  flex: 1; height: 3px; border-radius: 3px;
+  background: var(--border);
+  transition: background 0.3s;
+}
+.progress-dot.done { background: var(--accent); }
+.progress-dot.active { background: var(--accent); opacity: 0.5; }
+.onboard-step { display: none; }
+.onboard-step.active { display: block; }
+.step-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.onboard-card h2 {
+  font-family: var(--font-head);
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 0.5rem;
+}
+.onboard-card h2 em { font-style: italic; color: var(--accent); }
+.onboard-card .sub { color: var(--ink3); font-size: 0.88rem; margin-bottom: 2rem; font-weight: 300; }
+.option-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+.option-grid.single { grid-template-columns: 1fr; }
+.option-btn {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s;
+  font-family: var(--font-body);
+}
+.option-btn:hover { border-color: var(--accent); background: var(--accent-light); }
+.option-btn.selected { border-color: var(--accent); background: var(--accent-light); }
+.option-btn .opt-icon { font-size: 1.4rem; margin-bottom: 0.5rem; display: block; }
+.option-btn .opt-title { font-size: 0.9rem; font-weight: 600; color: var(--ink); display: block; margin-bottom: 2px; }
+.option-btn .opt-desc { font-size: 0.78rem; color: var(--ink3); font-weight: 300; line-height: 1.4; display: block; }
+.onboard-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; }
+.onboard-nav span { font-size: 0.8rem; color: var(--ink3); }
+
+/* ─── MEMBER DASHBOARD ─── */
+.app-layout {
+  flex: 1;
+  display: flex;
+}
+.sidebar {
+  width: 230px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--bg2);
+  padding: 1.5rem 0;
+  position: sticky;
+  top: 58px;
+  height: calc(100vh - 58px);
+  overflow-y: auto;
+}
+.sidebar-section { margin-bottom: 1.5rem; }
+.sidebar-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+  font-weight: 600;
+  padding: 0 1.25rem;
+  margin-bottom: 0.4rem;
+}
+.sidebar-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.88rem;
+  color: var(--ink2);
+  cursor: pointer;
+  border-radius: 0;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+  font-weight: 400;
+}
+.sidebar-link:hover { background: rgba(26,23,18,0.04); color: var(--ink); }
+.sidebar-link.active { color: var(--accent); background: var(--accent-light); border-left-color: var(--accent); font-weight: 600; }
+.sidebar-icon { font-size: 0.95rem; width: 18px; text-align: center; flex-shrink: 0; }
+.sidebar-badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 20px;
+}
+.pro-badge {
+  margin-left: auto;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  max-width: 860px;
+  overflow-y: auto;
+}
+
+/* panels */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* welcome header */
+.welcome-bar {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+}
+.welcome-bar h1 {
+  font-family: var(--font-head);
+  font-size: 1.9rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+.welcome-bar h1 em { font-style: italic; color: var(--accent); }
+.welcome-bar p { color: var(--ink3); font-size: 0.85rem; margin-top: 4px; }
+.user-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  padding: 0.35rem 1rem 0.35rem 0.35rem;
+  flex-shrink: 0;
+}
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.user-chip span { font-size: 0.82rem; font-weight: 500; }
+
+/* trial banner */
+.trial-banner {
+  background: var(--ink);
+  color: #f5f2eb;
+  border-radius: 14px;
+  padding: 1.1rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+}
+.trial-banner p { font-size: 0.88rem; font-weight: 300; }
+.trial-banner strong { font-weight: 600; color: #fff; }
+.btn-trial { background: var(--accent); color: #fff; font-weight: 600; font-size: 0.82rem; padding: 0.45rem 1rem; border-radius: 40px; border: none; cursor: pointer; }
+
+/* stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+.stat-card .s-label { font-size: 0.75rem; color: var(--ink3); margin-bottom: 0.4rem; font-weight: 500; }
+.stat-card .s-val {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--ink);
+}
+.stat-card .s-note { font-size: 0.75rem; color: var(--accent2); margin-top: 4px; }
+
+/* section headers */
+.panel-section { margin-bottom: 2.5rem; }
+.panel-section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.panel-section-head h3 {
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.panel-section-head a { font-size: 0.8rem; color: var(--accent); cursor: pointer; font-weight: 500; }
+
+/* diario card */
+.diario-card {
+  background: var(--ink);
+  color: #f5f2eb;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.diario-top {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+}
+.diario-meta { display: flex; align-items: center; gap: 10px; }
+.diario-meta .d-title { font-family: var(--font-head); font-size: 0.95rem; font-weight: 700; }
+.diario-meta .d-date { font-size: 0.75rem; color: rgba(245,242,235,0.4); }
+.d-badge { background: var(--accent); color: #fff; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; padding: 0.2rem 0.6rem; border-radius: 40px; }
+.diario-body { padding: 1.5rem; }
+.d-headline {
+  font-family: var(--font-head);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+.d-intro { font-size: 0.85rem; color: rgba(245,242,235,0.6); line-height: 1.7; font-weight: 300; margin-bottom: 1.25rem; }
+.d-items { display: flex; flex-direction: column; gap: 0; }
+.d-item {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 0.85rem 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.d-num { font-family: var(--font-head); font-size: 1.25rem; font-weight: 900; color: rgba(245,242,235,0.1); min-width: 24px; line-height: 1; }
+.d-item-text h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 3px; }
+.d-item-text p { font-size: 0.78rem; color: rgba(245,242,235,0.45); font-weight: 300; line-height: 1.55; }
+
+/* content cards */
+.content-list { display: flex; flex-direction: column; gap: 8px; }
+.content-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  display: flex; gap: 1rem; align-items: flex-start;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.content-item:hover { border-color: rgba(232,80,10,0.3); }
+.content-thumb {
+  width: 44px; height: 44px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.content-meta { flex: 1; }
+.content-meta h4 { font-size: 0.88rem; font-weight: 600; margin-bottom: 3px; line-height: 1.3; }
+.content-meta p { color: var(--ink3); font-size: 0.78rem; font-weight: 300; line-height: 1.5; }
+.content-tags { display: flex; gap: 6px; margin-top: 0.5rem; flex-wrap: wrap; }
+.tag {
+  font-size: 0.68rem; font-weight: 600;
+  padding: 2px 8px; border-radius: 4px;
+}
+.tag-sql { background: rgba(26,92,58,0.1); color: var(--accent2); }
+.tag-py { background: var(--accent-light); color: var(--accent); }
+.tag-bi { background: rgba(26,23,18,0.06); color: var(--ink2); }
+.lock-indicator {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 0.72rem; color: var(--ink3);
+  background: var(--bg2); border-radius: 6px;
+  padding: 0.3rem 0.6rem; flex-shrink: 0; align-self: center;
+}
+
+/* profile section */
+.profile-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+.profile-top {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 1.5rem; padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border2);
+}
+.avatar-lg {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.profile-info h3 { font-family: var(--font-head); font-size: 1.2rem; font-weight: 700; }
+.profile-info p { font-size: 0.82rem; color: var(--ink3); }
+.plan-pill {
+  margin-left: auto;
+  background: var(--accent-light);
+  border: 1px solid rgba(232,80,10,0.2);
+  color: var(--accent);
+  font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  padding: 0.3rem 0.8rem; border-radius: 40px;
+}
+.profile-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+}
+.profile-field { }
+.profile-field label { font-size: 0.75rem; color: var(--ink3); font-weight: 500; display: block; margin-bottom: 4px; }
+.profile-field p { font-size: 0.9rem; color: var(--ink); font-weight: 400; }
+
+/* upgrade card */
+.upgrade-card {
+  background: var(--ink);
+  color: #f5f2eb;
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex; gap: 2rem; align-items: center;
+  flex-wrap: wrap;
+}
+.upgrade-card h3 {
+  font-family: var(--font-head);
+  font-size: 1.3rem; font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.upgrade-card p { font-size: 0.85rem; color: rgba(245,242,235,0.6); font-weight: 300; max-width: 380px; }
+.upgrade-card .btn-primary { flex-shrink: 0; margin-top: 0.25rem; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 680px) {
+  .sidebar { display: none; }
+  .main-content { padding: 1.25rem; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .option-grid { grid-template-columns: 1fr; }
+  .profile-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.auth-card, .onboard-card { animation: fadeIn 0.35s ease both; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════
+     VIEW: LOGIN
+════════════════════════════════ -->
+<div id="view-login" class="view active">
+  <div class="topbar">
+    <span class="logo" onclick="goToLanding()"><span class="logo-dot"></span>Mundo Data</span>
+  </div>
+  <div class="auth-page">
+    <div class="auth-card">
+      <h2>Bienvenido <em>de vuelta</em></h2>
+      <p class="sub">Iniciá sesión para acceder a tu cuenta</p>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="tu@email.com">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" placeholder="••••••••">
+        <div class="form-error" id="login-error">Email o contraseña incorrectos</div>
+      </div>
+      <button class="btn btn-primary btn-lg btn-full" style="margin-top:0.5rem" onclick="doLogin()">Iniciar sesión</button>
+      <div class="auth-switch" style="margin-top:1.25rem">
+        ¿No tenés cuenta? <a onclick="showView('register')">Registrate gratis</a>
+      </div>
+      <div class="auth-switch" style="margin-top:0.5rem">
+        <a onclick="goToLanding()" style="color:var(--ink3)">← Volver al inicio</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     VIEW: REGISTER
+════════════════════════════════ -->
+<div id="view-register" class="view">
+  <div class="topbar">
+    <span class="logo" onclick="goToLanding()"><span class="logo-dot"></span>Mundo Data</span>
+  </div>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="trial-pill">✦ 7 días de prueba Pro gratis</div>
+      <h2>Empezá en <em>datos</em> hoy</h2>
+      <p class="sub">Sin tarjeta de crédito. Cancelá cuando quieras.</p>
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="reg-name" placeholder="Tu nombre">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="tu@email.com">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres">
+        <div class="form-error" id="reg-error">Completá todos los campos correctamente</div>
+      </div>
+      <button class="btn btn-primary btn-lg btn-full" style="margin-top:0.5rem" onclick="doRegister()">Crear cuenta gratis →</button>
+      <div class="auth-switch" style="margin-top:1.25rem">
+        ¿Ya tenés cuenta? <a onclick="showView('login')">Iniciar sesión</a>
+      </div>
+      <div class="auth-switch" style="margin-top:0.5rem">
+        <a onclick="goToLanding()" style="color:var(--ink3)">← Volver al inicio</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     VIEW: ONBOARDING
+════════════════════════════════ -->
+<div id="view-onboarding" class="view">
+  <div class="topbar">
+    <span class="logo"><span class="logo-dot"></span>Mundo Data</span>
+    <span style="font-size:0.8rem;color:var(--ink3)" id="step-counter">Paso 1 de 4</span>
+  </div>
+  <div class="onboard-page">
+    <div class="onboard-card">
+      <div class="onboard-progress">
+        <div class="progress-dot active" id="dot-1"></div>
+        <div class="progress-dot" id="dot-2"></div>
+        <div class="progress-dot" id="dot-3"></div>
+        <div class="progress-dot" id="dot-4"></div>
+      </div>
+
+      <!-- PASO 1: Perfil -->
+      <div class="onboard-step active" id="step-1">
+        <div class="step-label">Paso 1 de 4</div>
+        <h2>¿Cómo te <em>describís</em>?</h2>
+        <p class="sub">Esto nos ayuda a mostrarte el contenido más relevante para vos.</p>
+        <div class="option-grid">
+          <button class="option-btn" onclick="selectOption(this, 'perfil', 'junior')">
+            <span class="opt-icon">🚀</span>
+            <span class="opt-title">Estoy empezando</span>
+            <span class="opt-desc">No tengo experiencia en datos, quiero aprender desde cero</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(this, 'perfil', 'estudiante')">
+            <span class="opt-icon">🎓</span>
+            <span class="opt-title">Soy estudiante</span>
+            <span class="opt-desc">Estoy en la universidad y explorando el mundo data</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(this, 'perfil', 'transicion')">
+            <span class="opt-icon">🔄</span>
+            <span class="opt-title">Cambio de carrera</span>
+            <span class="opt-desc">Trabajo en otra industria y quiero moverme a datos</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(this, 'perfil', 'pro')">
+            <span class="opt-icon">💼</span>
+            <span class="opt-title">Ya trabajo en datos</span>
+            <span class="opt-desc">Tengo experiencia y quiero seguir creciendo</span>
+          </button>
+        </div>
+        <div class="onboard-nav">
+          <span></span>
+          <button class="btn btn-primary" id="next-1" disabled onclick="nextStep(2)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- PASO 2: Objetivo -->
+      <div class="onboard-step" id="step-2">
+        <div class="step-label">Paso 2 de 4</div>
+        <h2>¿Cuál es tu <em>objetivo</em> principal?</h2>
+        <p class="sub">Seleccioná el que más te representa ahora mismo.</p>
+        <div class="option-grid single">
+          <button class="option-btn" onclick="selectOption(this, 'objetivo', 'trabajo')">
+            <span class="opt-icon">💰</span>
+            <span class="opt-title">Conseguir mi primer trabajo en datos</span>
+            <span class="opt-desc">Quiero entrar al mercado laboral como analista, data scientist o similar</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(this, 'objetivo', 'ascenso')">
+            <span class="opt-icon">📈</span>
+            <span class="opt-title">Crecer en mi carrera actual</span>
+            <span class="opt-desc">Ya tengo trabajo y quiero sumar habilidades de datos para progresar</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(this, 'objetivo', 'freelance')">
+            <span class="opt-icon">🌐</span>
+            <span class="opt-title">Trabajar de forma independiente</span>
+            <span class="opt-desc">Quiero ofrecer servicios de análisis de datos como freelancer</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(this, 'objetivo', 'curiosidad')">
+            <span class="opt-icon">🔍</span>
+            <span class="opt-title">Aprender por curiosidad</span>
+            <span class="opt-desc">Me interesa el tema y quiero entender cómo funciona el mundo data</span>
+          </button>
+        </div>
+        <div class="onboard-nav">
+          <button class="btn btn-ghost" onclick="nextStep(1)">← Atrás</button>
+          <button class="btn btn-primary" id="next-2" disabled onclick="nextStep(3)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- PASO 3: Herramientas -->
+      <div class="onboard-step" id="step-3">
+        <div class="step-label">Paso 3 de 4</div>
+        <h2>¿Qué <em>herramientas</em> ya conocés?</h2>
+        <p class="sub">Seleccioná todas las que apliquen. Si no conocés ninguna, está perfecto.</p>
+        <div class="option-grid">
+          <button class="option-btn" onclick="toggleMulti(this, 'tools', 'excel')">
+            <span class="opt-icon">📊</span>
+            <span class="opt-title">Excel / Google Sheets</span>
+            <span class="opt-desc">Manejo básico o avanzado de hojas de cálculo</span>
+          </button>
+          <button class="option-btn" onclick="toggleMulti(this, 'tools', 'sql')">
+            <span class="opt-icon">🗄️</span>
+            <span class="opt-title">SQL</span>
+            <span class="opt-desc">Consultas a bases de datos</span>
+          </button>
+          <button class="option-btn" onclick="toggleMulti(this, 'tools', 'python')">
+            <span class="opt-icon">🐍</span>
+            <span class="opt-title">Python</span>
+            <span class="opt-desc">Pandas, NumPy, o scripting básico</span>
+          </button>
+          <button class="option-btn" onclick="toggleMulti(this, 'tools', 'bi')">
+            <span class="opt-icon">📉</span>
+            <span class="opt-title">Power BI / Tableau</span>
+            <span class="opt-desc">Dashboards y visualización</span>
+          </button>
+        </div>
+        <div class="onboard-nav">
+          <button class="btn btn-ghost" onclick="nextStep(2)">← Atrás</button>
+          <button class="btn btn-primary" onclick="nextStep(4)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- PASO 4: Disponibilidad -->
+      <div class="onboard-step" id="step-4">
+        <div class="step-label">Paso 4 de 4</div>
+        <h2>¿Cuánto tiempo podés <em>dedicarle</em> por semana?</h2>
+        <p class="sub">Sin presión. Cualquier cantidad está bien, te adaptamos el contenido.</p>
+        <div class="option-grid single">
+          <button class="option-btn" onclick="selectOption(this, 'tiempo', 'poco')">
+            <span class="opt-icon">⚡</span>
+            <span class="opt-title">Menos de 2 horas</span>
+            <span class="opt-desc">Poco tiempo pero quiero avanzar igual. El Diario de Datos es ideal para mí.</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(this, 'tiempo', 'medio')">
+            <span class="opt-icon">🕐</span>
+            <span class="opt-title">Entre 2 y 5 horas</span>
+            <span class="opt-desc">Puedo leer artículos y hacer tutoriales cortos durante la semana.</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(this, 'tiempo', 'mucho')">
+            <span class="opt-icon">🎯</span>
+            <span class="opt-title">Más de 5 horas</span>
+            <span class="opt-desc">Estoy comprometido. Quiero avanzar rápido con proyectos y práctica real.</span>
+          </button>
+        </div>
+        <div class="onboard-nav">
+          <button class="btn btn-ghost" onclick="nextStep(3)">← Atrás</button>
+          <button class="btn btn-primary" id="next-4" disabled onclick="finishOnboarding()">Entrar a Mundo Data →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     VIEW: MEMBER AREA
+════════════════════════════════ -->
+<div id="view-member" class="view">
+  <div class="topbar">
+    <span class="logo"><span class="logo-dot"></span>Mundo Data</span>
+    <div class="user-chip">
+      <div class="avatar" id="nav-avatar">ML</div>
+      <span id="nav-name">María</span>
+    </div>
+  </div>
+
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Principal</div>
+        <div class="sidebar-link active" onclick="showPanel('dashboard', this)">
+          <span class="sidebar-icon">🏠</span> Inicio
+        </div>
+        <div class="sidebar-link" onclick="showPanel('diario', this)">
+          <span class="sidebar-icon">📰</span> Diario de Datos
+          <span class="sidebar-badge">HOY</span>
+        </div>
+        <div class="sidebar-link" onclick="showPanel('tutoriales', this)">
+          <span class="sidebar-icon">📚</span> Tutoriales
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Comunidad</div>
+        <div class="sidebar-link" onclick="alert('Abre Discord en una pestaña nueva')">
+          <span class="sidebar-icon">💬</span> Discord
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Pro</div>
+        <div class="sidebar-link" onclick="showPanel('recursos', this)">
+          <span class="sidebar-icon">📁</span> Recursos
+          <span class="pro-badge">PRO</span>
+        </div>
+        <div class="sidebar-link" onclick="showPanel('desafios', this)">
+          <span class="sidebar-icon">🏆</span> Desafíos
+          <span class="pro-badge">PRO</span>
+        </div>
+      </div>
+      <div class="sidebar-section" style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+        <div class="sidebar-link" onclick="showPanel('perfil', this)">
+          <span class="sidebar-icon">👤</span> Mi perfil
+        </div>
+        <div class="sidebar-link" onclick="showView('login')" style="color:var(--ink3)">
+          <span class="sidebar-icon">←</span> Salir
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+
+      <!-- PANEL: DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="welcome-bar">
+          <div>
+            <h1 id="dash-greeting">Hola, <em>María</em> 👋</h1>
+            <p id="dash-sub">Bienvenida a Mundo Data · Prueba Pro activa</p>
+          </div>
+        </div>
+
+        <div class="trial-banner">
+          <p>⚡ Estás en tu <strong>prueba Pro gratuita</strong>. Quedan <strong>6 días</strong> para decidir.</p>
+          <button class="btn-trial" onclick="showPanel('perfil', null)">Ver plan →</button>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="s-label">Artículos leídos</div>
+            <div class="s-val">0</div>
+            <div class="s-note">Empezá hoy →</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-label">Días en la plataforma</div>
+            <div class="s-val">1</div>
+            <div class="s-note">¡Bienvenido!</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-label">Tu perfil</div>
+            <div class="s-val" id="dash-perfil" style="font-size:1rem;margin-top:6px">—</div>
+            <div class="s-note" id="dash-objetivo">—</div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-section-head">
+            <h3>📰 Diario de hoy</h3>
+            <a onclick="showPanel('diario', null)">Ver completo →</a>
+          </div>
+          <div class="diario-card">
+            <div class="diario-top">
+              <div class="diario-meta">
+                <span class="d-title">Mundo Data — Diario</span>
+                <span class="d-date" id="today-date"></span>
+              </div>
+              <span class="d-badge">Edición #247</span>
+            </div>
+            <div class="diario-body">
+              <div class="d-headline">OpenAI lanza nueva API para análisis de datasets estructurados directamente desde Python</div>
+              <p class="d-intro">Esta semana fue movida en el mundo del data. Tres noticias que importan para tu carrera.</p>
+              <div class="d-items">
+                <div class="d-item">
+                  <div class="d-num">01</div>
+                  <div class="d-item-text">
+                    <h4>OpenAI + Pandas: análisis con lenguaje natural</h4>
+                    <p>La nueva API permite hacer preguntas en español sobre un DataFrame y obtener resultados. Cambia el flujo para analistas junior.</p>
+                  </div>
+                </div>
+                <div class="d-item">
+                  <div class="d-num">02</div>
+                  <div class="d-item-text">
+                    <h4>Google BigQuery reduce precios un 30%</h4>
+                    <p>Buena noticia para equipos chicos y freelancers. El cambio entra en vigor el 1 de mayo.</p>
+                  </div>
+                </div>
+                <div class="d-item">
+                  <div class="d-num">03</div>
+                  <div class="d-item-text">
+                    <h4>Evidence.dev: reportes con Markdown y SQL</h4>
+                    <p>Una herramienta open-source para dashboards estáticos directamente desde archivos .sql. Sin servidores.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-section-head">
+            <h3>📚 Tutoriales recomendados para vos</h3>
+            <a onclick="showPanel('tutoriales', null)">Ver todos →</a>
+          </div>
+          <div class="content-list">
+            <div class="content-item">
+              <div class="content-thumb" style="background:rgba(26,92,58,0.08)">🗄️</div>
+              <div class="content-meta">
+                <h4>SQL desde cero: tu primera consulta en 20 minutos</h4>
+                <p>El punto de entrada perfecto si nunca escribiste una línea de SQL.</p>
+                <div class="content-tags"><span class="tag tag-sql">SQL</span><span class="tag tag-bi">Principiante</span></div>
+              </div>
+            </div>
+            <div class="content-item">
+              <div class="content-thumb" style="background:var(--accent-light)">🐍</div>
+              <div class="content-meta">
+                <h4>Python para datos: por dónde empezar en 2025</h4>
+                <p>Un roadmap claro para aprender Python enfocado en análisis de datos.</p>
+                <div class="content-tags"><span class="tag tag-py">Python</span><span class="tag tag-bi">Principiante</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL: DIARIO -->
+      <div class="panel" id="panel-diario">
+        <div class="welcome-bar">
+          <div><h1>Diario de <em>Datos</em></h1><p>Tu resumen diario de la industria · Actualizado cada mañana</p></div>
+        </div>
+        <div class="diario-card">
+          <div class="diario-top">
+            <div class="diario-meta">
+              <span class="d-title">Mundo Data — Diario</span>
+              <span class="d-date" id="today-date2"></span>
+            </div>
+            <span class="d-badge">Edición #247</span>
+          </div>
+          <div class="diario-body">
+            <div class="d-headline">OpenAI lanza nueva API para análisis de datasets estructurados directamente desde Python</div>
+            <p class="d-intro">Esta semana fue movida en el mundo del data. OpenAI sorprendió con una integración directa con Pandas, Google anunció cambios en BigQuery y hay una nueva herramienta open-source de visualización que vale la pena conocer.</p>
+            <div class="d-items">
+              <div class="d-item">
+                <div class="d-num">01</div>
+                <div class="d-item-text">
+                  <h4>OpenAI + Pandas: análisis de datos con lenguaje natural</h4>
+                  <p>La nueva API permite hacer preguntas en español sobre un DataFrame y obtener resultados automáticamente. Esto cambia bastante el flujo de trabajo para analistas junior que todavía están aprendiendo la sintaxis.</p>
+                </div>
+              </div>
+              <div class="d-item">
+                <div class="d-num">02</div>
+                <div class="d-item-text">
+                  <h4>Google BigQuery reduce precios un 30% para queries bajo 1TB</h4>
+                  <p>Buena noticia para equipos chicos y freelancers. El cambio entra en vigor el 1 de mayo y aplica a todas las regiones. Una señal de que la guerra de precios en cloud data warehouses sigue.</p>
+                </div>
+              </div>
+              <div class="d-item">
+                <div class="d-num">03</div>
+                <div class="d-item-text">
+                  <h4>Evidence.dev: reportes de datos con Markdown y SQL</h4>
+                  <p>Una herramienta open-source para crear dashboards estáticos directamente desde archivos .sql. Sin servidores, sin configuración. Ideal para analistas que quieren compartir insights rápido.</p>
+                </div>
+              </div>
+              <div class="d-item">
+                <div class="d-num">04</div>
+                <div class="d-item-text">
+                  <h4>El rol de "Analytics Engineer" ya supera al "Data Analyst" en búsquedas en LinkedIn</h4>
+                  <p>Un cambio en la demanda del mercado que viene acelerando desde 2023. Si estás buscando trabajo, vale la pena entender qué implica este rol y si encaja con tu perfil.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL: TUTORIALES -->
+      <div class="panel" id="panel-tutoriales">
+        <div class="welcome-bar">
+          <div><h1><em>Tutoriales</em> y artículos</h1><p>Contenido técnico para aprender a tu ritmo</p></div>
+        </div>
+        <div class="content-list">
+          <div class="content-item">
+            <div class="content-thumb" style="background:rgba(26,92,58,0.08)">🗄️</div>
+            <div class="content-meta">
+              <h4>SQL desde cero: tu primera consulta en 20 minutos</h4>
+              <p>El punto de entrada perfecto si nunca escribiste una línea de SQL.</p>
+              <div class="content-tags"><span class="tag tag-sql">SQL</span><span class="tag tag-bi">Principiante</span></div>
+            </div>
+          </div>
+          <div class="content-item">
+            <div class="content-thumb" style="background:var(--accent-light)">🐍</div>
+            <div class="content-meta">
+              <h4>Python para datos: por dónde empezar en 2025</h4>
+              <p>Un roadmap claro para aprender Python enfocado en análisis de datos.</p>
+              <div class="content-tags"><span class="tag tag-py">Python</span><span class="tag tag-bi">Principiante</span></div>
+            </div>
+          </div>
+          <div class="content-item">
+            <div class="content-thumb" style="background:rgba(26,92,58,0.08)">📊</div>
+            <div class="content-meta">
+              <h4>Window functions en SQL: guía práctica con ejemplos reales</h4>
+              <p>Dominá ROW_NUMBER, RANK, LAG y LEAD. El tema que más diferencia a un analista junior de uno senior.</p>
+              <div class="content-tags"><span class="tag tag-sql">SQL</span><span class="tag tag-bi">Intermedio</span></div>
+            </div>
+          </div>
+          <div class="content-item">
+            <div class="content-thumb" style="background:rgba(26,23,18,0.04)">📉</div>
+            <div class="content-meta" style="opacity:0.55">
+              <h4>Modelado dimensional: esquemas estrella y snowflake con dbt</h4>
+              <p>Cómo diseñar un datawarehouse que escale. Casos reales de empresas medianas.</p>
+              <div class="content-tags"><span class="tag tag-bi">🔒 Solo Pro</span></div>
+            </div>
+            <div class="lock-indicator">🔒 Pro</div>
+          </div>
+          <div class="content-item">
+            <div class="content-thumb" style="background:rgba(26,23,18,0.04)">🤖</div>
+            <div class="content-meta" style="opacity:0.55">
+              <h4>Machine Learning para analistas: de Excel a scikit-learn</h4>
+              <p>El camino más corto para agregar ML a tu perfil sin necesitar un doctorado.</p>
+              <div class="content-tags"><span class="tag tag-bi">🔒 Solo Pro</span></div>
+            </div>
+            <div class="lock-indicator">🔒 Pro</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL: RECURSOS (Pro) -->
+      <div class="panel" id="panel-recursos">
+        <div class="welcome-bar">
+          <div><h1><em>Recursos</em> descargables</h1><p>Datasets, notebooks y templates listos para usar</p></div>
+        </div>
+        <div class="upgrade-card">
+          <div>
+            <h3>Contenido exclusivo Pro</h3>
+            <p>Los recursos descargables están disponibles para miembros Pro. Incluye notebooks de Python, datasets reales y templates de SQL listos para usar en tus proyectos.</p>
+            <button class="btn btn-primary" style="margin-top:1rem" onclick="alert('Upgrade — próximamente con Stripe/MercadoPago')">Activar plan Pro →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL: DESAFÍOS (Pro) -->
+      <div class="panel" id="panel-desafios">
+        <div class="welcome-bar">
+          <div><h1><em>Desafíos</em> mensuales</h1><p>Ponés a prueba tus habilidades contra la comunidad</p></div>
+        </div>
+        <div class="upgrade-card">
+          <div>
+            <h3>Desafíos para miembros Pro</h3>
+            <p>Cada mes publicamos un desafío de análisis con un dataset real. Los mejores trabajos se destacan en la comunidad y en las redes. Disponible con el plan Pro.</p>
+            <button class="btn btn-primary" style="margin-top:1rem" onclick="alert('Upgrade — próximamente')">Activar plan Pro →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL: PERFIL -->
+      <div class="panel" id="panel-perfil">
+        <div class="welcome-bar">
+          <div><h1>Mi <em>perfil</em></h1><p>Tu cuenta y plan de suscripción</p></div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-top">
+            <div class="avatar-lg" id="profile-avatar">ML</div>
+            <div class="profile-info">
+              <h3 id="profile-name">María López</h3>
+              <p id="profile-email">maria@email.com</p>
+            </div>
+            <span class="plan-pill">Pro — prueba</span>
+          </div>
+          <div class="profile-grid">
+            <div class="profile-field">
+              <label>Perfil</label>
+              <p id="profile-perfil">—</p>
+            </div>
+            <div class="profile-field">
+              <label>Objetivo</label>
+              <p id="profile-objetivo">—</p>
+            </div>
+            <div class="profile-field">
+              <label>Herramientas</label>
+              <p id="profile-tools">—</p>
+            </div>
+            <div class="profile-field">
+              <label>Tiempo disponible</label>
+              <p id="profile-tiempo">—</p>
+            </div>
+          </div>
+        </div>
+        <div class="upgrade-card">
+          <div>
+            <h3>Activar plan Pro completo</h3>
+            <p>Tu prueba gratuita vence en 6 días. Suscribite para seguir accediendo al Diario de Datos, recursos descargables y desafíos mensuales.</p>
+          </div>
+          <button class="btn btn-primary btn-lg" onclick="alert('Checkout — próximamente con Stripe/MercadoPago')">$9/mes →</button>
+        </div>
+      </div>
+
+    </div><!-- /main-content -->
+  </div><!-- /app-layout -->
+</div>
+
+<script>
+// ── STATE ──
+const state = {
+  name: '', email: '',
+  onboarding: { perfil: null, objetivo: null, tools: [], tiempo: null }
+};
+
+// ── NAVIGATION ──
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function goToLanding() {
+  // In production this would navigate to the landing page
+  alert('← Volviendo a la landing de Mundo Data');
+}
+
+// ── AUTH ──
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value.trim();
+  const err   = document.getElementById('login-error');
+  if (!email || !pass) { err.classList.add('show'); return; }
+  err.classList.remove('show');
+  state.name  = email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  state.email = email;
+  enterMember();
+}
+
+function doRegister() {
+  const name  = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass  = document.getElementById('reg-pass').value.trim();
+  const err   = document.getElementById('reg-error');
+  if (!name || !email || pass.length < 8) { err.classList.add('show'); return; }
+  err.classList.remove('show');
+  state.name  = name;
+  state.email = email;
+  showView('onboarding');
+}
+
+// ── ONBOARDING ──
+let currentStep = 1;
+
+function selectOption(btn, key, val) {
+  // deselect siblings
+  btn.closest('.option-grid').querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.onboarding[key] = val;
+  const nextBtn = document.getElementById('next-' + currentStep);
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+function toggleMulti(btn, key, val) {
+  btn.classList.toggle('selected');
+  const arr = state.onboarding[key] || [];
+  const idx = arr.indexOf(val);
+  if (btn.classList.contains('selected')) { if (idx === -1) arr.push(val); }
+  else { if (idx > -1) arr.splice(idx, 1); }
+  state.onboarding[key] = arr;
+  // step 3 has no required selection
+}
+
+function nextStep(n) {
+  document.getElementById('step-' + currentStep).classList.remove('active');
+  // update progress dots
+  document.getElementById('dot-' + currentStep).classList.remove('active');
+  document.getElementById('dot-' + currentStep).classList.add('done');
+  currentStep = n;
+  document.getElementById('step-' + n).classList.add('active');
+  document.getElementById('dot-' + n).classList.add('active');
+  document.getElementById('step-counter').textContent = 'Paso ' + n + ' de 4';
+}
+
+function finishOnboarding() {
+  enterMember();
+}
+
+// ── MEMBER AREA ──
+function enterMember() {
+  const first    = state.name.split(' ')[0];
+  const initials = state.name.split(' ').filter(Boolean).map(n=>n[0]).slice(0,2).join('').toUpperCase();
+
+  document.getElementById('nav-avatar').textContent   = initials;
+  document.getElementById('nav-name').textContent     = first;
+  document.getElementById('dash-greeting').innerHTML  = 'Hola, <em>' + first + '</em> 👋';
+  document.getElementById('profile-avatar').textContent = initials;
+  document.getElementById('profile-name').textContent   = state.name;
+  document.getElementById('profile-email').textContent  = state.email;
+
+  // map onboarding answers to readable labels
+  const perfilMap   = { junior:'Estoy empezando', estudiante:'Estudiante', transicion:'Cambio de carrera', pro:'Profesional en datos' };
+  const objetivoMap = { trabajo:'Conseguir trabajo en datos', ascenso:'Crecer en mi carrera', freelance:'Trabajo independiente', curiosidad:'Aprender por curiosidad' };
+  const tiempoMap   = { poco:'Menos de 2 hs/semana', medio:'2 a 5 hs/semana', mucho:'Más de 5 hs/semana' };
+  const toolsMap    = { excel:'Excel', sql:'SQL', python:'Python', bi:'Power BI/Tableau' };
+
+  const ob = state.onboarding;
+  const perfilLabel   = perfilMap[ob.perfil]   || '—';
+  const objetivoLabel = objetivoMap[ob.objetivo]|| '—';
+  const tiempoLabel   = tiempoMap[ob.tiempo]   || '—';
+  const toolsLabel    = ob.tools.length ? ob.tools.map(t=>toolsMap[t]).join(', ') : 'Ninguna aún';
+
+  document.getElementById('dash-perfil').textContent   = perfilLabel;
+  document.getElementById('dash-objetivo').textContent = objetivoLabel;
+  document.getElementById('profile-perfil').textContent   = perfilLabel;
+  document.getElementById('profile-objetivo').textContent = objetivoLabel;
+  document.getElementById('profile-tools').textContent    = toolsLabel;
+  document.getElementById('profile-tiempo').textContent   = tiempoLabel;
+
+  // set today's date
+  const today = new Date().toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+  ['today-date','today-date2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = capitalize(today);
+  });
+
+  showPanel('dashboard', null);
+  showView('member');
+}
+
+function showPanel(id, linkEl) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  if (linkEl) linkEl.classList.add('active');
+}
+</script>
+</body>
+</html>
