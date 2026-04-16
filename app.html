@@ -788,7 +788,7 @@ body {
       </div>
       <div class="sidebar-section">
         <div class="sidebar-label">Comunidad</div>
-        <div class="sidebar-link" onclick="alert('Abre Discord en una pestaña nueva')">
+        <div class="sidebar-link" onclick="window.open('https://discord.gg/mundodata','_blank')">
           <span class="sidebar-icon">💬</span> Discord
         </div>
       </div>
@@ -807,7 +807,7 @@ body {
         <div class="sidebar-link" onclick="showPanel('perfil', this)">
           <span class="sidebar-icon">👤</span> Mi perfil
         </div>
-        <div class="sidebar-link" onclick="showView('login')" style="color:var(--ink3)">
+        <div class="sidebar-link" onclick="doLogout()" style="color:var(--ink3)">
           <span class="sidebar-icon">←</span> Salir
         </div>
       </div>
@@ -1027,7 +1027,7 @@ body {
           <div>
             <h3>Contenido exclusivo Pro</h3>
             <p>Los recursos descargables están disponibles para miembros Pro. Incluye notebooks de Python, datasets reales y templates de SQL listos para usar en tus proyectos.</p>
-            <button class="btn btn-primary" style="margin-top:1rem" onclick="alert('Upgrade — próximamente con Stripe/MercadoPago')">Activar plan Pro →</button>
+            <button class="btn btn-primary" style="margin-top:1rem" onclick="window.location.href='#perfil'">Activar plan Pro →</button>
           </div>
         </div>
       </div>
@@ -1041,7 +1041,7 @@ body {
           <div>
             <h3>Desafíos para miembros Pro</h3>
             <p>Cada mes publicamos un desafío de análisis con un dataset real. Los mejores trabajos se destacan en la comunidad y en las redes. Disponible con el plan Pro.</p>
-            <button class="btn btn-primary" style="margin-top:1rem" onclick="alert('Upgrade — próximamente')">Activar plan Pro →</button>
+            <button class="btn btn-primary" style="margin-top:1rem" onclick="showPanel('perfil',null)">Activar plan Pro →</button>
           </div>
         </div>
       </div>
@@ -1084,7 +1084,7 @@ body {
             <h3>Activar plan Pro completo</h3>
             <p>Tu prueba gratuita vence en 6 días. Suscribite para seguir accediendo al Diario de Datos, recursos descargables y desafíos mensuales.</p>
           </div>
-          <button class="btn btn-primary btn-lg" onclick="alert('Checkout — próximamente con Stripe/MercadoPago')">$9/mes →</button>
+          <button class="btn btn-primary btn-lg" onclick="showPanel('perfil',null)">$9/mes →</button>
         </div>
       </div>
 
@@ -1092,8 +1092,16 @@ body {
   </div><!-- /app-layout -->
 </div>
 
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// ── SUPABASE CONFIG ──
+const SUPABASE_URL  = 'https://eqmmohplbhtjnovklssp.supabase.co';
+const SUPABASE_KEY  = 'sb_publishable_DhZuhxfhN9izE8gq63a4Rg_yLDUCvWy';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 // ── STATE ──
+// Guarda temporalmente los datos mientras el usuario navega la app
 const state = {
   name: '', email: '',
   onboarding: { perfil: null, objetivo: null, tools: [], tiempo: null }
@@ -1109,33 +1117,105 @@ function goToLanding() {
   window.location.href = 'index.html';
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  if (window.location.hash === '#register') {
+// Al cargar la página: si hay sesión activa, va directo al área de miembros
+// Si viene con #register, abre el registro
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    // Usuario ya logueado — cargar su perfil y entrar
+    const { data: profile } = await sb.from('profiles').select('*').eq('email', session.user.email).single();
+    if (profile) {
+      state.name  = profile.nombre;
+      state.email = profile.email;
+      state.onboarding = {
+        perfil:   profile.perfil,
+        objetivo: profile.objetivo,
+        tools:    profile.tools ? profile.tools.split(',') : [],
+        tiempo:   profile.tiempo
+      };
+      enterMember();
+    }
+  } else if (window.location.hash === '#register') {
     showView('register');
   }
 });
 
-// ── AUTH ──
-function doLogin() {
+// ── AUTH: LOGIN ──
+async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value.trim();
   const err   = document.getElementById('login-error');
+  const btn   = document.querySelector('#view-login .btn-primary');
+
   if (!email || !pass) { err.classList.add('show'); return; }
   err.classList.remove('show');
-  state.name  = email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-  state.email = email;
+  btn.textContent = 'Entrando...';
+  btn.disabled = true;
+
+  // signInWithPassword: Supabase verifica email y contraseña
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  if (error) {
+    err.textContent = 'Email o contraseña incorrectos';
+    err.classList.add('show');
+    btn.textContent = 'Iniciar sesión';
+    btn.disabled = false;
+    return;
+  }
+
+  // Traer el perfil de la tabla profiles
+  const { data: profile } = await sb.from('profiles').select('*').eq('email', email).single();
+  if (profile) {
+    state.name  = profile.nombre;
+    state.email = profile.email;
+    state.onboarding = {
+      perfil:   profile.perfil,
+      objetivo: profile.objetivo,
+      tools:    profile.tools ? profile.tools.split(',') : [],
+      tiempo:   profile.tiempo
+    };
+  } else {
+    state.name  = email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+    state.email = email;
+  }
   enterMember();
 }
 
-function doRegister() {
+// ── AUTH: REGISTRO ──
+async function doRegister() {
   const name  = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim();
   const pass  = document.getElementById('reg-pass').value.trim();
   const err   = document.getElementById('reg-error');
-  if (!name || !email || pass.length < 8) { err.classList.add('show'); return; }
+  const btn   = document.querySelector('#view-register .btn-primary');
+
+  if (!name || !email || pass.length < 8) {
+    err.textContent = 'Completá todos los campos. La contraseña debe tener 8+ caracteres.';
+    err.classList.add('show');
+    return;
+  }
   err.classList.remove('show');
+  btn.textContent = 'Creando cuenta...';
+  btn.disabled = true;
+
+  // signUp: crea el usuario en Supabase Auth (guarda email + contraseña encriptada)
+  const { data, error } = await sb.auth.signUp({ email, password: pass });
+
+  if (error) {
+    err.textContent = error.message === 'User already registered'
+      ? 'Este email ya tiene una cuenta. Iniciá sesión.'
+      : 'Hubo un error. Intentá de nuevo.';
+    err.classList.add('show');
+    btn.textContent = 'Crear cuenta gratis →';
+    btn.disabled = false;
+    return;
+  }
+
+  // Guardar nombre y email en el state para el onboarding
   state.name  = name;
   state.email = email;
+  btn.textContent = 'Crear cuenta gratis →';
+  btn.disabled = false;
   showView('onboarding');
 }
 
@@ -1143,7 +1223,6 @@ function doRegister() {
 let currentStep = 1;
 
 function selectOption(btn, key, val) {
-  // deselect siblings
   btn.closest('.option-grid').querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   state.onboarding[key] = val;
@@ -1158,12 +1237,10 @@ function toggleMulti(btn, key, val) {
   if (btn.classList.contains('selected')) { if (idx === -1) arr.push(val); }
   else { if (idx > -1) arr.splice(idx, 1); }
   state.onboarding[key] = arr;
-  // step 3 has no required selection
 }
 
 function nextStep(n) {
   document.getElementById('step-' + currentStep).classList.remove('active');
-  // update progress dots
   document.getElementById('dot-' + currentStep).classList.remove('active');
   document.getElementById('dot-' + currentStep).classList.add('done');
   currentStep = n;
@@ -1172,7 +1249,31 @@ function nextStep(n) {
   document.getElementById('step-counter').textContent = 'Paso ' + n + ' de 4';
 }
 
-function finishOnboarding() {
+async function finishOnboarding() {
+  const btn = document.getElementById('next-4');
+  btn.textContent = 'Guardando...';
+  btn.disabled = true;
+
+  const ob = state.onboarding;
+
+  // Guardar perfil en la tabla profiles de Supabase
+  // insert: crea una fila nueva con todos los datos del usuario
+  const { error } = await sb.from('profiles').insert({
+    nombre:   state.name,
+    email:    state.email,
+    perfil:   ob.perfil   || '',
+    objetivo: ob.objetivo || '',
+    tools:    ob.tools.join(','),
+    tiempo:   ob.tiempo   || '',
+    plan:     'trial'
+  });
+
+  if (error) {
+    // Si ya existe el perfil (registro duplicado), igual dejamos entrar
+    console.warn('Profile insert error:', error.message);
+  }
+
+  btn.textContent = 'Entrar a Mundo Data →';
   enterMember();
 }
 
@@ -1181,33 +1282,31 @@ function enterMember() {
   const first    = state.name.split(' ')[0];
   const initials = state.name.split(' ').filter(Boolean).map(n=>n[0]).slice(0,2).join('').toUpperCase();
 
-  document.getElementById('nav-avatar').textContent   = initials;
-  document.getElementById('nav-name').textContent     = first;
-  document.getElementById('dash-greeting').innerHTML  = 'Hola, <em>' + first + '</em> 👋';
+  document.getElementById('nav-avatar').textContent     = initials;
+  document.getElementById('nav-name').textContent       = first;
+  document.getElementById('dash-greeting').innerHTML    = 'Hola, <em>' + first + '</em> 👋';
   document.getElementById('profile-avatar').textContent = initials;
   document.getElementById('profile-name').textContent   = state.name;
   document.getElementById('profile-email').textContent  = state.email;
 
-  // map onboarding answers to readable labels
   const perfilMap   = { junior:'Estoy empezando', estudiante:'Estudiante', transicion:'Cambio de carrera', pro:'Profesional en datos' };
   const objetivoMap = { trabajo:'Conseguir trabajo en datos', ascenso:'Crecer en mi carrera', freelance:'Trabajo independiente', curiosidad:'Aprender por curiosidad' };
   const tiempoMap   = { poco:'Menos de 2 hs/semana', medio:'2 a 5 hs/semana', mucho:'Más de 5 hs/semana' };
   const toolsMap    = { excel:'Excel', sql:'SQL', python:'Python', bi:'Power BI/Tableau' };
 
   const ob = state.onboarding;
-  const perfilLabel   = perfilMap[ob.perfil]   || '—';
-  const objetivoLabel = objetivoMap[ob.objetivo]|| '—';
-  const tiempoLabel   = tiempoMap[ob.tiempo]   || '—';
+  const perfilLabel   = perfilMap[ob.perfil]    || '—';
+  const objetivoLabel = objetivoMap[ob.objetivo] || '—';
+  const tiempoLabel   = tiempoMap[ob.tiempo]    || '—';
   const toolsLabel    = ob.tools.length ? ob.tools.map(t=>toolsMap[t]).join(', ') : 'Ninguna aún';
 
-  document.getElementById('dash-perfil').textContent   = perfilLabel;
-  document.getElementById('dash-objetivo').textContent = objetivoLabel;
+  document.getElementById('dash-perfil').textContent      = perfilLabel;
+  document.getElementById('dash-objetivo').textContent    = objetivoLabel;
   document.getElementById('profile-perfil').textContent   = perfilLabel;
   document.getElementById('profile-objetivo').textContent = objetivoLabel;
   document.getElementById('profile-tools').textContent    = toolsLabel;
   document.getElementById('profile-tiempo').textContent   = tiempoLabel;
 
-  // set today's date
   const today = new Date().toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
   ['today-date','today-date2'].forEach(id => {
@@ -1217,6 +1316,13 @@ function enterMember() {
 
   showPanel('dashboard', null);
   showView('member');
+}
+
+// ── LOGOUT ──
+// El botón "Salir" del sidebar llama a esta función
+async function doLogout() {
+  await sb.auth.signOut();
+  window.location.href = 'index.html';
 }
 
 function showPanel(id, linkEl) {
